@@ -80,10 +80,11 @@ class MoleculePreprocessor:
             bond_type = bond.GetBondType()
             self.graph.add_edge(begin_idx, end_idx, bond_type=bond_type)
 
-    def translate_sybyl_types(self):  # from loic code
+    def translate_sybyl_types(self):
         """
         Translate element types to sybyl type. Reads a PDB file using Openbabel package and
         returns a list of translated element types.
+        Original code from loic.
         """
         obConversion = ob.OBConversion()
         obConversion.SetInFormat('pdb')
@@ -108,6 +109,7 @@ class MoleculePreprocessor:
         self.sybyl_types = l_syb  # Saves the list of translated sybyl types
 
 
+
     def map_sybyl_types(self):
         """
         Map SYBYL atom types to their corresponding integer indices using the sybyl_map.
@@ -121,12 +123,13 @@ class MoleculePreprocessor:
             if sybyl in self.sybyl_map:
                 self.sybyl_indices.append(self.sybyl_map[sybyl])
 
-
     def prepare_data(self):
         """
         Prepare node features and adjacency matrix for VAE encoding.
         """
-        num_nodes = self.graph.number_of_nodes()
+        h_filtered_graph = nx.subgraph(self.graph, [n for n, attr in self.graph.nodes(data=True) if attr['symbol'] != 'H'])
+
+        num_nodes = h_filtered_graph.number_of_nodes()
         
         # Initialize node features array: [atomic_number, x, y, z]
         node_features_basic = np.zeros((num_nodes, 4))
@@ -148,9 +151,11 @@ class MoleculePreprocessor:
         
         # Map SYBYL types to integer indices
         self.map_sybyl_types()
-        sybyl_indices_array = np.array(self.sybyl_indices).reshape(-1, 1)  # Shape: (num_nodes, 1)
+        sybyl_indices_array = np.array([self.sybyl_indices[n] for n in h_filtered_graph]).reshape(-1, 1)  # Shape: (num_nodes, 1)
 
-        
+        print("node_features_basic shape:", node_features_basic.shape)
+        print("sybyl_indices_array shape:", sybyl_indices_array.shape)
+
         # Concatenate basic features with Sybyl encoded features
         self.node_features = np.hstack((node_features_basic, sybyl_indices_array))  # Shape: (num_nodes, 4 + num_sybyl_features)
         
@@ -273,8 +278,8 @@ def process_pdb_files(input_dir, output_dir, normalize=False):
 
 if __name__ == "__main__":
     # Define the input and output directories
-    input_directory = r"C:\Users\DCR\Documents\University\project\GVAEs\Project\data"
-    output_directory = r"C:\Users\DCR\Documents\University\project\GVAEs\Project\data\raw_EEE"
+    input_directory = r"C:\Users\DCR\Documents\University\project\Protein File Process\data\AHG"
+    output_directory = r"C:\Users\DCR\Documents\University\project\Link Prediction\data\AHG_raw"
 
     # Call the processing function
     process_pdb_files(input_directory, output_directory, normalize=False)
