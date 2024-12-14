@@ -12,10 +12,6 @@ class MoleculePreprocessor:
     def __init__(self, pdb_file, remove_hs=True):
         """
         Initialize the MoleculePreprocessor with a PDB file.
-
-        Parameters:
-        - pdb_file (str): Path to the PDB file.
-        - remove_hs (bool): Whether to remove hydrogen atoms
         """
         self.pdb_file = pdb_file
         self.remove_hs = remove_hs
@@ -66,10 +62,6 @@ class MoleculePreprocessor:
 
 
     def translate_sybyl_types(self):  # from loic code
-        """
-        Translate element types to sybyl type. Reads a PDB file using Openbabel package and
-        returns a list of translated element types.
-        """
         obConversion = ob.OBConversion()
         obConversion.SetInFormat('pdb')
         obConversion.SetInAndOutFormats("pdb", "mol2")
@@ -136,13 +128,8 @@ class MoleculePreprocessor:
         
 
     def normalize_data(self):
-        """
-        Normalize the node features for VAE encoding.
-        """
         self.scaler = StandardScaler()
         self.node_features_normalized = self.scaler.fit_transform(self.node_features)
-
-
 
 
     def preprocess(self, normalize=True):
@@ -202,10 +189,6 @@ class MoleculePreprocessor:
     def preprocess_and_save(self, output_dir, normalize=True):
         """
         Execute preprocessing and save the node features and distance matrix into a single CSV file.
-
-        Parameters:
-        - output_dir (str): Directory where the output CSV will be saved.
-        - normalize (bool): Whether to normalize the node features before saving.
         """
         
         self.preprocess(normalize=normalize)
@@ -242,11 +225,6 @@ class MoleculePreprocessor:
 def process_directory(input_dir, output_dir, normalize=True):
     """
     Process all PDB files in the input directory and save the processed data.
-
-    Parameters:
-    - input_dir (str): Directory containing PDB files.
-    - output_dir (str): Directory where processed CSV files will be saved.
-    - normalize (bool): Whether to normalize node features before saving.
     """
     
     os.makedirs(output_dir, exist_ok=True)
