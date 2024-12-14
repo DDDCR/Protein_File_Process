@@ -12,13 +12,6 @@ import h5py
 
 class MoleculePreprocessor:
     def __init__(self, pdb_file, remove_hs=True):
-        """
-        Initialize the MoleculePreprocessor with a PDB file.
-
-        Parameters:
-        - pdb_file (str): Path to the PDB file.
-        - remove_hs (bool): Whether to remove hydrogen atoms
-        """
         self.pdb_file = pdb_file
         self.remove_hs = remove_hs
         self.mol = None
@@ -82,8 +75,7 @@ class MoleculePreprocessor:
 
     def translate_sybyl_types(self):
         """
-        Translate element types to sybyl type. Reads a PDB file using Openbabel package and
-        returns a list of translated element types.
+        Translate element types to sybyl type.
         Original code from loic.
         """
         obConversion = ob.OBConversion()
@@ -224,12 +216,6 @@ class MoleculePreprocessor:
 def process_pdb_files(input_dir, output_dir, normalize=False):
     """
     Process all PDB files in the input directory and save node features,
-    adjacency matrices, and distance matrices into separate HDF5 files.
-
-    Parameters:
-    - input_dir (str): Path to the directory containing PDB files.
-    - output_dir (str): Path to the directory where HDF5 files will be saved.
-    - normalize (bool): Whether to normalize node features.
     """
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
